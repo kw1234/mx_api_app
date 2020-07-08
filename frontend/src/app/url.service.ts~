@@ -1,0 +1,23 @@
+import {Injectable} from '@angular/core';
+import {Http, Headers, RequestOptions} from '@angular/http';
+//import {Router} from '@angular/router';
+
+@Injectable()
+export class UrlService {
+
+constructor(private http: Http) {}
+
+    BASE_URL = 'http://localhost:3000/api';
+
+    urlInput(urlData) {
+        console.log(urlData.url);
+        this.http.post(this.BASE_URL+'/search', urlData).subscribe(res => {
+	    console.log("mambo");
+	    console.log("bo");
+            console.log(urlData.url+" paul");
+	    console.log(Object.keys(res));
+	    return res;
+        });
+    }
+
+}

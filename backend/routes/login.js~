@@ -1,0 +1,119 @@
+var mysql = require('mysql');
+
+var connection = mysql.createConnection({
+        host     : 'localhost',
+        user     : 'root',
+        password : 'password',
+        database : 'cushion'
+    });
+
+
+var atrium = require('mx-atrium');
+
+var mxApiKey = '26eef1e5-6df7-b7a3-9caa-85cb7c7e25f5';
+var mxClientId = '3f445873-e02b-4dec-9e47-00af7bc292fa';
+
+var client = new atrium.AtriumClient(mxApiKey, mxClientId, "https://vestibule.mx.com");
+
+var userGuid = "USR-d0646719-39d3-4775-bf8f-ebf12bf08e74"; // string | The unique identifier for a `user`.
+
+//var institutionCode = "mxbank"; // string | The institution_code of the institution.                                                                                                                                             
+
+//var response = client.institutions.readInstitutionCredentials(institutionCode);
+
+const axios = require('axios');
+
+const options = {
+    headers: {
+
+        'Accept': 'application/vnd.mx.atrium.v1+json',
+        'Content-Type': 'application/json',
+        'MX-API-Key': '26eef1e5-6df7-b7a3-9caa-85cb7c7e25f5',
+        'MX-Client-ID': '3f445873-e02b-4dec-9e47-00af7bc292fa'
+
+    }
+
+};
+
+var mxMemberUrl = 'https://vestibule.mx.com/users/USR-d0646719-39d3-4775-bf8f-ebf12bf08e74/members';
+
+connection.connect(function(err){
+        if(!err) {
+            console.log("Users database is connected ... \n\n");
+        } else {
+            console.log(err);
+            console.log("Error connecting to login database ... \n\n");
+        }
+    });
+
+exports.register = async function(req, res) {
+
+    var user = {
+        "email": req.body.email,
+        "password": req.body.password,
+	"institutionCode": req.body.institutionCode
+    }
+
+    console.log(user);
+
+    var response = client.institutions.readInstitutionCredentials(user.institutionCode);
+    response.then(function(value) {
+	    var res = value.body;
+	    console.log(res.credentials);
+	    createMember(user.institutionCode, res.credentials[0].guid, res.credentials[1].guid, user.email, user.password);
+	});
+
+    var sql = `INSERT INTO members (id, email, password) VALUES
+    (uuid(), '${user.email}', '${user.password}')`;
+
+    connection.query(sql, function(error, result, fields) {
+            if (error) {
+		console.log(error);
+                sendRegistrationError(res, error);
+            }
+
+            console.log(user);
+        });
+};
+
+function sendRegistrationError(res, error) {
+    console.log("error in registration");
+    return res.json({success: false, message: 'error in registering: '+error});
+}
+
+function createMember(institutionCode, guid1, guid2, username, password) {
+    console.log(institutionCode);
+    console.log(guid1);
+    console.log(guid2);
+    console.log(institutionCode);
+    axios.post(mxMemberUrl,
+
+	       {
+		   "member": {
+		       "institution_code": institutionCode,
+			   "credentials": [
+					   {
+					       "guid": guid1,
+						   "value": username
+						   },
+					   {
+					       "guid": guid2,
+						   "value": password
+						   }
+					   ],
+			   "skip_aggregation": true
+			   }
+	       },
+           options
+	       )
+	.then((res) => {
+		console.log(`statusCode: ${res.statusCode}`)
+		console.log("grape");
+		console.log(res.body)
+	    })
+	.catch((error) => {
+		console.error(error)
+		throw error;
+	    });
+
+}

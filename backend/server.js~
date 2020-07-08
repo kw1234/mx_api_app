@@ -1,0 +1,42 @@
+var express = require('express');
+var app = express();
+var login = require('./routes/login');
+var path = require('path');
+
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
+var serialize = require('node-serialize');
+
+
+var atrium = require('mx-atrium');
+
+var mxApiKey = '26eef1e5-6df7-b7a3-9caa-85cb7c7e25f5';
+var mxClientId = '3f445873-e02b-4dec-9e47-00af7bc292fa';
+
+var client = new atrium.AtriumClient(mxApiKey, mxClientId, "https://vestibule.mx.com");
+
+var userGuid = "USR-d0646719-39d3-4775-bf8f-ebf12bf08e74"; // string | The unique identifier for a `user`.
+var memberGuid = "MBR-5511dc03-9300-48f6-a78f-dca6554b6f2c";
+
+
+app.use((req, res, next) => {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept,\
+ Authorization");
+        next();
+    });
+
+
+var api = express.Router();
+
+app.get('/', function(req, res) {
+        res.sendFile(path.join(__dirname, '/public', 'index.html'));
+    });
+
+api.post('/register', login.register);
+
+app.use('/api', api);
+
+
+app.listen(3000);

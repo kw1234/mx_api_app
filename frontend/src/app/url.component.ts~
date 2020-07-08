@@ -1,0 +1,60 @@
+
+import { Component } from '@angular/core';
+import {MatToolbar} from '@angular/material/toolbar';
+import {UrlService} from './url.service';
+
+@Component({
+        selector: 'urlcomp',
+        template:`
+        <mat-card>
+            <mat-form-field>
+                <input matInput [(ngModel)]="urlData.url" placeholder="Url">
+            </mat-form-field>
+	    <button mat-raised-button color="primary" (click)="urlInput()">Search</button>
+	    <mat-form-field>
+                <input matInput [(ngModel)]="wordData.word" placeholder="Word">
+            </mat-form-field>
+	    <button mat-raised-button color="primary" (click)="highlightWord()">Highlight</button>
+        </mat-card>
+	<div *ngFor="let text of urlServ.text | async">
+            <mat-card class="card">
+                <mat-card-content> {{text.topWords}}
+                    <div *ngFor="let word of text.topWords">
+                        <a routerLink='/highlight/{{word[0]}}'>{{word[0]}}</a>
+			<button mat-raised-button color="primary" (click)="highlightWord({{word[0]}})">Highlight</button>
+		    </div>
+		</mat-card-content>
+             </mat-card>
+             <mat-card class="card">
+	        <div [innerHTML]="text.text"></div>
+	        <!-- <p>{{text.text}}</p> -->
+                <!-- <mat-card-content> {{text.text}} </mat-card-content> -->
+             </mat-card>
+        </div>
+        `
+})
+
+export class UrlComponent {
+       constructor(public urlServ: UrlService) {}
+
+       urlData = {
+           url: ''
+       }
+
+       wordData = {
+           word: ''
+       }      
+
+       urlInput() {
+          console.log("clicky");
+          this.urlServ.urlInput(this.urlData);
+       }
+
+       highlightWord() {
+           this.urlServ.highlightWord(this.wordData);
+       }
+
+       highlightWordBolo(word) {
+          this.urlServ.highlightWord(word);
+       }
+}
