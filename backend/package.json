@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/imtibbet/interview-07-01-2020#readme",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "blockspring": "0.0.6",
     "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
