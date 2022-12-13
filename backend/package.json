@@ -21,7 +21,7 @@
     "blockspring": "0.0.6",
     "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "mx-atrium": "^2.11.1",
     "mysql": "^2.18.1",
     "node-serialize": "0.0.4",
